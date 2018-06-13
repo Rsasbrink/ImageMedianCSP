@@ -1,11 +1,11 @@
-package nl.hva.pc.part1;
-
-import nl.hva.pc.part1.common.Constants;
+import common.Constants;
+import common.Image;
+import common.ImagePart;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
 
-public class MessageConsumer {
+public class MedianConsumer {
 
     // TODO 2.1. Take a look at the consumer source-code
 
@@ -30,17 +30,17 @@ public class MessageConsumer {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             // Create the destination (Topic or Queue)
-            Destination destination = session.createQueue("QUEUE.MESSAGE");
+            Destination destination = session.createQueue("QUEUE.imageParts");
 
-            // Create a MessageConsumer from the Session to the Topic or Queue
+            // Create a MedianConsumer from the Session to the Topic or Queue
             javax.jms.MessageConsumer consumer = session.createConsumer(destination);
 
             // Wait for a message
-            Message message = consumer.receive();
+            ObjectMessage message = (ObjectMessage) consumer.receive();
 
-            if (message instanceof TextMessage) {
-                TextMessage textMessage = (TextMessage) message;
-                String text = textMessage.getText();
+            if (message instanceof ObjectMessage) {
+                ObjectMessage textMessage = message;
+                ObjectMessage text = textMessage;
                 System.out.println("Received: " + text);
             } else {
                 System.out.println("Received: " + message);
