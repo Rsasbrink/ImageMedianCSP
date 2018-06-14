@@ -1,9 +1,9 @@
 import common.Constants;
-import common.Image;
 import common.ImagePart;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
+import java.util.Arrays;
 
 public class MedianConsumer {
 
@@ -21,7 +21,7 @@ public class MedianConsumer {
 
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.URL);
-
+            connectionFactory.setTrustedPackages(Arrays.asList("java.lang", "common"));
             // Create a Connection
             Connection connection = connectionFactory.createConnection();
             connection.start();

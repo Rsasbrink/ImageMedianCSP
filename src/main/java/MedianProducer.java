@@ -1,15 +1,14 @@
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import common.Constants;
 import common.Image;
 import common.ImagePart;
 import org.apache.activemq.ActiveMQConnectionFactory;
-
 import javax.imageio.ImageIO;
 import javax.jms.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+
 
 public class MedianProducer {
 

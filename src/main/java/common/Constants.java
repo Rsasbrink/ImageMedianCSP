@@ -9,5 +9,6 @@ public interface Constants {
     Image image = new Image(input, output, extension);
     Integer consumerAmount = 2;
     Integer packagesAmount = consumerAmount + 1;
+    Boolean queueIsEmpty = false;
 
 }
