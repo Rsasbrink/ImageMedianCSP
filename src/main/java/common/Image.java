@@ -109,6 +109,7 @@ public class Image {
     public void createImage() {
         try {
             ImageIO.write(this.image, this.getExtension(), new File(this.output));
+            System.out.println("image created");
         } catch (IOException ex) {
             Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
         }

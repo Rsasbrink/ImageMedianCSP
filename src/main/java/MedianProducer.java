@@ -3,6 +3,7 @@ import common.Constants;
 import common.Image;
 import common.ImagePart;
 import org.apache.activemq.ActiveMQConnectionFactory;
+
 import javax.imageio.ImageIO;
 import javax.jms.*;
 import java.awt.image.BufferedImage;
@@ -18,7 +19,7 @@ public class MedianProducer {
     // TODO 2.6: Run some consumers, what happens?
     // TODO 2.7: Change the code of the producer and the consumer to use topics instead of queues. What's happened?
     public static void main(String[] args) {
-
+    long startTime = System.currentTimeMillis();
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.URL);
@@ -29,7 +30,7 @@ public class MedianProducer {
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             // Create the destination (Topic or Queue)
-            Destination destination = session.createQueue("QUEUE.imageParts");
+            Destination destination = session.createQueue(Constants.queueName);
 
             // Create a MedianProducer from the Session to the Topic or Queue
             javax.jms.MessageProducer producer = session.createProducer(destination);
@@ -57,29 +58,32 @@ public class MedianProducer {
                 int height = heightPerPackage;
                 int width = imageWidth;
                 ImagePart imagePart = new ImagePart(offsetHeight, height, width);
-
-                // Create a messages
-                String text = "partial: " + i;
                 ObjectMessage  message = session.createObjectMessage(imagePart);
 
                 // Tell the producer to send the message
-                System.out.println("Sent message: " + message + " : " + Thread.currentThread().getName());
                 producer.send(message);
+                System.out.println("Sent message: " + i + " : " + Thread.currentThread().getName());
+               //MedianConsumer.main();
             }
 
             if (modulo > 0) {
-                Object moduloObject = new Object() {
-                    int offsetHeight = packageAmount * heightPerPackage;
+
+                int offsetHeight = packageAmount * heightPerPackage;
                     int height = imageHeight - (packageAmount * heightPerPackage);
                     int width = imageWidth;
-                };
-                // queue.put(moduloObject);
+                ImagePart moduloPart = new ImagePart(offsetHeight, height, width);
+                ObjectMessage message = session.createObjectMessage(moduloPart);
+                producer.send(message);
+                System.out.printf("Sent message: modulo : %s%n", Thread.currentThread().getName());
+                //MedianConsumer.main();
             }
 
 
             // Clean up
             session.close();
             connection.close();
+            image.createImage();
+            System.out.println(System.currentTimeMillis() - startTime);
         } catch (JMSException e) {
             e.printStackTrace();
         } catch (IOException e) {
