@@ -7,11 +7,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
  * @author rowanvi
  */
 public class Image {
@@ -19,7 +16,7 @@ public class Image {
     private String input;
     private String output;
     private String extension;
-    private BufferedImage image = null;
+    private BufferedImage image;
     private BufferedImage originalImage;
     private int count = 0;
     private int modulo = 0;
@@ -28,7 +25,19 @@ public class Image {
         this.input = input;
         this.output = output;
         this.extension = extension;
+        this.needToCreateImage = true;
     }
+
+    public boolean isNeedToCreateImage() {
+        return needToCreateImage;
+    }
+
+    public void setNeedToCreateImage(boolean needToCreateImage) {
+        this.needToCreateImage = needToCreateImage;
+    }
+
+    private boolean needToCreateImage;
+
 
     public BufferedImage getOriginalImage() {
         return originalImage;
@@ -109,9 +118,8 @@ public class Image {
     public void createImage() {
         try {
             ImageIO.write(this.image, this.getExtension(), new File(this.output));
-            System.out.println("image created");
         } catch (IOException ex) {
-            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex);
         }
     }
 

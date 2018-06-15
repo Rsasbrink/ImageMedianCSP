@@ -17,7 +17,7 @@ public class MedianConsumer {
     // TODO 2.3.1. Is it possible specify a timeout when receiving messages?
     // The idea is leaving after some amount of time
 
-    public static void main(String args[]) {
+    public static void main() {
         try {
             Boolean queueIsEmpty = false;
             // Create a ConnectionFactory
@@ -35,22 +35,38 @@ public class MedianConsumer {
 
             // Create a MedianConsumer from the Session to the Topic or Queue
             javax.jms.MessageConsumer consumer = session.createConsumer(destination);
+            Image image = Constants.image;
             while (!queueIsEmpty) {
-                System.out.println("di");
                 // Wait for a message
                 ObjectMessage message = (ObjectMessage) consumer.receive();
                 if (message instanceof ObjectMessage) {
                     ImagePart imagePart = (ImagePart) message.getObject();
-                    Image image = Constants.image;
-                    //image.applyMedian(imagePart.getOffsetHeight(), imagePart.getHeight(), imagePart.getWidth());
+                    int height = imagePart.getHeight();
+                    if (height > 0) {
+                        image.applyMedian(imagePart.getOffsetHeight(), imagePart.getHeight(), imagePart.getWidth());
+                    } else {
+                        queueIsEmpty = true;
+                        if (image.isNeedToCreateImage()) {
+                            image.setNeedToCreateImage(false);
+                            image.createImage();
+                        }
+
+
+                        consumer.close();
+                        session.close();
+                        connection.close();
+                    }
+
                 } else {
-                    System.out.println("Received: " + message);
                     queueIsEmpty = true;
+
                 }
             }
             consumer.close();
             session.close();
             connection.close();
+
+
         } catch (JMSException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {

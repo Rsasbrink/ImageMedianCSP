@@ -19,7 +19,7 @@ public class MedianProducer {
     // TODO 2.6: Run some consumers, what happens?
     // TODO 2.7: Change the code of the producer and the consumer to use topics instead of queues. What's happened?
     public static void main(String[] args) {
-    long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(Constants.URL);
@@ -37,8 +37,8 @@ public class MedianProducer {
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
 
+
             Image image = Constants.image;
-            System.out.println(image.getInput());
             File imageFile = new File(image.getInput());
             BufferedImage bufferedImage = ImageIO.read(imageFile);
             image.setOriginalImage(bufferedImage);
@@ -48,6 +48,8 @@ public class MedianProducer {
             if (image.getImage() == null) {
                 image.setImage(new BufferedImage(imageWidth, imageHeight, bufferedImage.getType()));
             }
+
+
             final int packageAmount = Constants.packagesAmount;
             final int heightPerPackage = imageHeight / packageAmount;
             modulo = imageHeight % packageAmount;
@@ -58,32 +60,35 @@ public class MedianProducer {
                 int height = heightPerPackage;
                 int width = imageWidth;
                 ImagePart imagePart = new ImagePart(offsetHeight, height, width);
-                ObjectMessage  message = session.createObjectMessage(imagePart);
+                ObjectMessage message = session.createObjectMessage(imagePart);
 
                 // Tell the producer to send the message
                 producer.send(message);
-                System.out.println("Sent message: " + i + " : " + Thread.currentThread().getName());
-               //MedianConsumer.main();
+
             }
 
             if (modulo > 0) {
-
                 int offsetHeight = packageAmount * heightPerPackage;
-                    int height = imageHeight - (packageAmount * heightPerPackage);
-                    int width = imageWidth;
+                int height = imageHeight - (packageAmount * heightPerPackage);
+                int width = imageWidth;
                 ImagePart moduloPart = new ImagePart(offsetHeight, height, width);
                 ObjectMessage message = session.createObjectMessage(moduloPart);
                 producer.send(message);
-                System.out.printf("Sent message: modulo : %s%n", Thread.currentThread().getName());
-                //MedianConsumer.main();
             }
 
+
+            for (int i = 0; i < Constants.consumerAmout; i++) {
+                ImagePart emptyPart = new ImagePart(0, 0, 0);
+                ObjectMessage message = session.createObjectMessage(emptyPart);
+                producer.send(message);
+                MedianConsumer.main();
+            }
 
             // Clean up
             session.close();
             connection.close();
-            image.createImage();
             System.out.println(System.currentTimeMillis() - startTime);
+
         } catch (JMSException e) {
             e.printStackTrace();
         } catch (IOException e) {
